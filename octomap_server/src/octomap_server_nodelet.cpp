@@ -50,7 +50,7 @@ public:
   {
     NODELET_DEBUG("Initializing octomap server nodelet ...");
     ros::NodeHandle& nh = this->getNodeHandle();
-    ros::NodeHandle& private_nh = this->getPrivateNodeHandle();
+    ros::NodeHandle& private_nh = this->getPrivateNodeHandle();    
     server_.reset(new OctomapServer(private_nh, nh));
 
     std::string mapFilename("");

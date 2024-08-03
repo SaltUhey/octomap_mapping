@@ -174,6 +174,8 @@ OctomapServer::OctomapServer(const ros::NodeHandle private_nh_, const ros::NodeH
   m_mapPub = m_nh.advertise<nav_msgs::OccupancyGrid>("projected_map", 5, m_latchedTopics);
   m_fmarkerPub = m_nh.advertise<visualization_msgs::MarkerArray>("free_cells_vis_array", 1, m_latchedTopics);
 
+  m_markerCustomPub =m_nh.advertise<visualization_msgs::MarkerArray>("occupied_cells_vis_array_custom", 1);
+
   m_pointCloudSub = new message_filters::Subscriber<sensor_msgs::PointCloud2> (m_nh, "cloud_in", 5);
   m_tfPointCloudSub = new tf::MessageFilter<sensor_msgs::PointCloud2> (*m_pointCloudSub, m_tfListener, m_worldFrameId, 5);
   m_tfPointCloudSub->registerCallback(boost::bind(&OctomapServer::insertCloudCallback, this, boost::placeholders::_1));
@@ -230,7 +232,70 @@ bool OctomapServer::openFile(const std::string& filename){
       ROS_ERROR("Could not read OcTree in file, currently there are no other types supported in .ot");
       return false;
     }
+    visualization_msgs::MarkerArray marker_array;
+    visualization_msgs::Marker marker;
+    double max_occupancy;
+    double min_occupancy;
+    int n = 0;
+    int count_size = m_octree->getTreeDepth()+1;
+    // for (octomap::ColorOcTree::leaf_iterator it = m_octree->begin_leafs(),
+    //     end = m_octree->end_leafs(); it != end; ++it) {
+    //     if (m_octree->isNodeOccupied(*it)) {
+    //       visualization_msgs::Marker marker;
+    //         double occupancy = it->getOccupancy();
+    //         if(n == 0){
+    //             max_occupancy = occupancy;
+    //             min_occupancy = occupancy;
+    //         }
+    //         if (n >= 1 && occupancy > max_occupancy){
+    //             max_occupancy = occupancy;
+    //         }
+    //         if (n >= 1 && occupancy < min_occupancy){
+    //             min_occupancy = occupancy;
+    //         }
+    //         geometry_msgs::Point cube_center;
+    //         cube_center.x = it.getX();
+    //         cube_center.y = it.getY();
+    //         cube_center.z = it.getZ();
+    //         marker.points.push_back(cube_center);
+    //         // double size = m_octree->getNodeSize(i);
+    //         // marker_array.markers[i].header.frame_id = m_worldFrameId;
+    //         // marker_array.markers[i].header.stamp = ros::Time::now();;
+    //         // marker_array.markers[i].ns = "map";
+    //         // marker_array.markers[i].id = i;
+    //         // marker_array.markers[i].type = visualization_msgs::Marker::CUBE_LIST;
+    //         // marker_array.markers[i].scale.x = size;
+    //         // marker_array.markers[i].scale.y = size;
+    //         // marker_array.markers[i].scale.z = size;
+    //         // marker_array.markers[i].color = m_colorFree;
+    //         n++;
+    //     }
+    // }
+    // marker_array.markers.push_back(marker);
+    std::cerr << "test!!!!" << count_size << std::endl;
+    // for (int i= 0; i < count_size; ++i){
+    //   double size = m_octree->getNodeSize(i);
 
+    //   marker_array.markers[i].header.frame_id = m_worldFrameId;
+    //   marker_array.markers[i].header.stamp = ros::Time::now();;
+    //   marker_array.markers[i].ns = "map";
+    //   marker_array.markers[i].id = i;
+    //   marker_array.markers[i].type = visualization_msgs::Marker::CUBE_LIST;
+    //   marker_array.markers[i].scale.x = size;
+    //   marker_array.markers[i].scale.y = size;
+    //   marker_array.markers[i].scale.z = size;
+    //   marker_array.markers[i].color = m_colorFree;
+
+
+    //   if (marker_array.markers[i].points.size() > 0)
+    //     marker_array.markers[i].action = visualization_msgs::Marker::ADD;
+    //   else
+    //     marker_array.markers[i].action = visualization_msgs::Marker::DELETE;
+    // }
+    // std::cerr << "max_occupancy:" << max_occupancy << std::endl;
+    // std::cerr << "min_occupancy:" << min_occupancy << std::endl;
+    m_markerCustomPub.publish(marker_array);
+    std::cerr << "test2222" << std::endl;
   } else{
     return false;
   }
